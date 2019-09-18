@@ -33,6 +33,7 @@ sysinfo.txt
 
 # Builds
 *.apk
-*.unitypackage
+Assets/*.unitypackage
 /.DS_Store
 /Logs
+/.idea
