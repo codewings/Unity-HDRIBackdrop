@@ -53,23 +53,7 @@ public class HDRIBackdrop : MonoBehaviour
     {
         var m = BackdropMaterial;
 
-        if (m != null)
-        {
-            m.SetFloat("_SkylightIntensity", RenderSettings.ambientIntensity);
-
-            var v = transform.localToWorldMatrix.MultiplyPoint(Vector3.zero) + transform.rotation * ProjectCenter;
-            m.SetVector("_ProjectPosition", new Vector4(v.x, v.y, v.z, HDRIAngle / 180.0f * Mathf.PI));
-        }
-
-        if (mCachedReflectionProbe)
-        {
-            mCachedReflectionProbe.intensity = RenderSettings.ambientIntensity;
-        }
-    }
-
-    void OnValidate()
-    {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         // skip if open prefab in asset editor
         if (gameObject.scene.path == null || gameObject.scene.name == null)
             return;
@@ -79,21 +63,19 @@ public class HDRIBackdrop : MonoBehaviour
 
         transform.localScale = new Vector3(EnvDomeScale, EnvDomeScale, EnvDomeScale);
 
-        var m = BackdropMaterial;
-
         if (m != null)
         {
             m.SetTexture("_EnvironmentCube", EnvironmentCube);
 
             if (CameraProjection)
             {
-                m.EnableKeyword("USE_CAMERAPOSITION");
-                m.DisableKeyword("USE_PIVOTPOSITION");
+                m.EnableKeyword("_POSITIONTYPE_USE_CAMERAPOSITION");
+                m.DisableKeyword("_POSITIONTYPE_USE_PIVOTPOSITION");
             }
             else
             {
-                m.DisableKeyword("USE_CAMERAPOSITION");
-                m.EnableKeyword("USE_PIVOTPOSITION");
+                m.DisableKeyword("_POSITIONTYPE_USE_CAMERAPOSITION");
+                m.EnableKeyword("_POSITIONTYPE_USE_PIVOTPOSITION");
             }
         }
 
@@ -134,7 +116,19 @@ public class HDRIBackdrop : MonoBehaviour
 
         mCachedRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         mCachedRenderer.receiveShadows    = true;
-    #endif
+#endif
+
+
+        if (m != null)
+        {
+            var v = transform.localToWorldMatrix.MultiplyPoint(Vector3.zero) + transform.rotation * ProjectCenter;
+            m.SetVector("_ProjectPosition", new Vector4(v.x, v.y, v.z, HDRIAngle / 180.0f * Mathf.PI));
+        }
+
+        if (mCachedReflectionProbe)
+        {
+            mCachedReflectionProbe.intensity = RenderSettings.ambientIntensity;
+        }
     }
 
     Renderer        mCachedRenderer;
